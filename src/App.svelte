@@ -161,7 +161,7 @@
         {/if}
       </h2>
       {#if state.score.wounds >= 10}
-        You are defeated and your rampage comes to an end. Your funeral is suitably expensive, an a colossus is raised
+        You are defeated and your rampage comes to an end. Your funeral is suitably expensive, and a colossus is raised
         over your tomb.
       {:else if state.score.media >= 10}
         Your identity is uncovered and the cameras force you back to the palace to nurse your injured pride.
