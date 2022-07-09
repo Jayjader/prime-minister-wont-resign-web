@@ -8,7 +8,7 @@
       {description: 'You wander into work event. You leave holding a beer.', effect: new Map([['trail', 1]])},
       {description: 'You get stuck in a ministerial revolving door.', effect: new Map([['media', 1]])},
       {description: "It's the chancellor, holding a bag marked SWAG", effect: new Map([['trail', 1]])},
-      {description: "You briefly get locked in combait with a cabinet", effect: new Map([['wounds', 1]])},
+      {description: "You briefly get locked in combat with a cabinet", effect: new Map([['wounds', 1]])},
       {description: 'You detect the smell of fear and silver spoons', effect: new Map([['trail', 2]])},
       {description: 'You stop to cure a passerby of scrofula', effect: new Map([['media', 1]])},
     ],
@@ -156,7 +156,7 @@
     {/if}
     {#if state?.gameOver}
       <h2 class="banner">
-        {#if state.score.trail >= 10 && state.score.wounds < 10 && state.score.media < 10 && !state?.brexit}Succes!
+        {#if state.score.trail >= 10 && state.score.wounds < 10 && state.score.media < 10 && !state?.brexit}Success!
         {:else}Game Over
         {/if}
       </h2>
