@@ -48,7 +48,7 @@
     ],
   ]
 
-  let brexitRolls = 2
+  let brexitRolls = 0
 
   export function generateNewEvent() {
     const eventType = Math.floor(Math.random() * 2)
@@ -64,7 +64,7 @@
         brexitRolls++
       }
     } else {
-      brexitRolls = 2
+      brexitRolls = 0
     }
     return eventsPerType[eventType][event]
   }
