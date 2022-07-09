@@ -48,9 +48,24 @@
     ],
   ]
 
+  let brexitRolls = 2
+
   export function generateNewEvent() {
     const eventType = Math.floor(Math.random() * 2)
-    const event = Math.floor(Math.random() * 5)
+    const event = Math.floor(Math.random() * 6)
+    if (event === 5) {
+      if (brexitRolls > 1) {
+        console.log('sudden brexit!')
+        return {
+          description: 'You accidentally leave the European Union, and drown in the ocean.',
+          effect: new Map([['brexit', true]])
+        }
+      } else {
+        brexitRolls++
+      }
+    } else {
+      brexitRolls = 2
+    }
     return eventsPerType[eventType][event]
   }
 
@@ -67,9 +82,22 @@
   $: {
     if (state !== null) {
       const aggregatedScoreEffects = state.events.reduce((accu, {effect}) => {
-        [...effect].forEach(([scoreType, increment]) => accu.set(scoreType, (accu.get(scoreType) ?? 0) + increment));
+        if (accu.get('brexit')) {
+          return accu
+        }
+        if (effect.get('brexit')) {
+          accu.set('brexit', true)
+        } else {
+          [...effect].forEach(([scoreType, increment]) => {
+            accu.set(scoreType, (accu.get(scoreType) ?? 0) + increment);
+          });
+        }
         return accu
       }, new Map())
+      if (aggregatedScoreEffects.get('brexit')) {
+        state.brexit = true
+        state.gameOver = true
+      }
       state.score = {
         wounds: (aggregatedScoreEffects.get('wounds') ?? 0),
         media: (aggregatedScoreEffects.get('media') ?? 0),
@@ -114,27 +142,34 @@
   <section>
     {#if state.events.length > 0}
       <h2 class="banner">Latest Event</h2>
+      {#if state?.brexit}
+        <h3>Sudden Brexit!</h3>
+      {/if}
       {state.events[state.events.length - 1].description}
-      <ul>
-        {#each [...state.events[state.events.length - 1].effect] as [scoreType, increment]}
-          <li>+{increment} <strong>{scoreType}</strong></li>
-        {/each}
-      </ul>
+      {#if !state?.brexit}
+        <ul>
+          {#each [...state.events[state.events.length - 1].effect] as [scoreType, increment]}
+            <li>+{increment} <strong>{scoreType}</strong></li>
+          {/each}
+        </ul>
+      {/if}
     {/if}
     {#if state?.gameOver}
       <h2 class="banner">
-        {#if state.score.trail >= 10 && state.score.wounds < 10 && state.score.media < 10}Succes!{:else}Game Over{/if}
+        {#if state.score.trail >= 10 && state.score.wounds < 10 && state.score.media < 10 && !state?.brexit}Succes!
+        {:else}Game Over
+        {/if}
       </h2>
       {#if state.score.wounds >= 10}
         You are defeated and your rampage comes to an end. Your funeral is suitably expensive, an a colossus is raised
         over your tomb.
       {:else if state.score.media >= 10}
         Your identity is uncovered and the cameras force you back to the palace to nurse your injured pride.
-      {:else }
+      {:else if state.score.trail >= 10}
         You finally catch up to the prime minister and bring an end to this farce. You stand on a pile of your defeated
         enemies and howl at the uncaring gods above.
       {/if}
-      <button on:click={() => state = newInitState()}>Start New Game</button>
+      <button on:click={() => state = null}>Back to Title Screen</button>
       {#if !state?.viewStory}
         <button on:click={() => state = {...state, viewStory: true}}>view story</button>
       {:else }
@@ -148,7 +183,7 @@
             <tr>
               <td>{event.description}</td>
               <td>
-                {#each [...event.effect] as [scoreType, increment]}<span>+{increment} {scoreType}</span>{/each}
+                {[...event.effect].map(([scoreType, increment]) => scoreType === 'brexit' ? 'sudden brexit' : `+${increment} ${scoreType}`).join(', ')}
               </td>
             </tr>
           {/each}
